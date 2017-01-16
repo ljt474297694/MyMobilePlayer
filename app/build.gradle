@@ -30,4 +30,5 @@ dependencies {
     compile project(':xutils')
     compile files('libs/gson-2.2.4.jar')
     compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
+    compile files('libs/glide-3.7.0.jar')
 }

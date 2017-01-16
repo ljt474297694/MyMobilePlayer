@@ -3,6 +3,8 @@ package com.atguigu.ljt.mymobileplayer.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,8 @@ import com.atguigu.ljt.mymobileplayer.fragment.NetVideoFragment;
 
 import java.util.ArrayList;
 
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
+
 import static android.os.Build.VERSION_CODES.M;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private int position;
     private Fragment tempFragment;
     private long currentTime;
+    SensorManager sensorManager;
+    JCVideoPlayer.JCAutoFullscreenListener sensorEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +42,9 @@ public class MainActivity extends AppCompatActivity {
         rg_main = (RadioGroup) findViewById(R.id.rg_main);
         isGrantExternalRW(this);
         initFragment();
-
         initListener();
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorEventListener = new JCVideoPlayer.JCAutoFullscreenListener();
 
     }
 
@@ -136,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (JCVideoPlayer.backPress()) {
+            return;
+        }
         if (position != 0) {
             rg_main.check(R.id.rb_local_video);
         } else if (System.currentTimeMillis() - currentTime > 2000) {
@@ -145,5 +155,18 @@ public class MainActivity extends AppCompatActivity {
         } else {
             finish();
         }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(sensorEventListener);
+        JCVideoPlayer.releaseAllVideos();
     }
 }

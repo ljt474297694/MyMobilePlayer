@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atguigu.ljt.mymobileplayer.R;
+import com.atguigu.ljt.mymobileplayer.adapter.NetAudioFragmentAdapter;
 import com.atguigu.ljt.mymobileplayer.base.BaseFragment;
 import com.atguigu.ljt.mymobileplayer.bean.NetAudioBean;
 import com.atguigu.ljt.mymobileplayer.util.CacheUtils;
@@ -41,6 +42,7 @@ public class NetAudioFragment extends BaseFragment {
     @Bind(R.id.tv_nomedia)
     TextView tvNomedia;
     private List<NetAudioBean.ListBean> datas;
+    private NetAudioFragmentAdapter myAdapter;
 
     @Override
     public View initView() {
@@ -97,18 +99,18 @@ public class NetAudioFragment extends BaseFragment {
 
         datas = parsedJson(result);
         LogUtil.e(datas.get(0).getText() + "-----------");
-//        if(datas != null && datas.size() >0){
-//            //有视频
-//            tvNomedia.setVisibility(View.GONE);
-//            //设置适配器
-//            myAdapter = new NetAudioFragmentAdapter(mContext,datas);
-//            listview.setAdapter(myAdapter);
-//        }else{
-//            //没有视频
-//            tvNomedia.setVisibility(View.VISIBLE);
-//        }
-//
-//        progressbar.setVisibility(View.GONE);
+        if(datas != null && datas.size() >0){
+            //有视频
+            tvNomedia.setVisibility(View.GONE);
+            //设置适配器
+            myAdapter = new NetAudioFragmentAdapter(mContext,datas);
+            listview.setAdapter(myAdapter);
+        }else{
+            //没有视频
+            tvNomedia.setVisibility(View.VISIBLE);
+        }
+
+        progressbar.setVisibility(View.GONE);
 
     }
 
