@@ -29,4 +29,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile project(':xutils')
     compile files('libs/gson-2.2.4.jar')
+    compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
 }
