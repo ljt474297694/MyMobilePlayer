@@ -1,7 +1,9 @@
-package com.atguigu.ljt.mymobileplayer;
+package com.atguigu.ljt.mymobileplayer.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.atguigu.ljt.mymobileplayer.R;
 
 public class MainActivity extends AppCompatActivity {
 
