@@ -28,4 +28,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile project(':xutils')
+    compile files('libs/gson-2.2.4.jar')
 }

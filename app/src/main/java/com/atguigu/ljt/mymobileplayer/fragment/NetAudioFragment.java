@@ -9,13 +9,17 @@ import android.widget.TextView;
 
 import com.atguigu.ljt.mymobileplayer.R;
 import com.atguigu.ljt.mymobileplayer.base.BaseFragment;
+import com.atguigu.ljt.mymobileplayer.bean.NetAudioBean;
 import com.atguigu.ljt.mymobileplayer.util.CacheUtils;
 import com.atguigu.ljt.mymobileplayer.util.Constants;
+import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,6 +40,7 @@ public class NetAudioFragment extends BaseFragment {
     ProgressBar progressbar;
     @Bind(R.id.tv_nomedia)
     TextView tvNomedia;
+    private List<NetAudioBean.ListBean> datas;
 
     @Override
     public View initView() {
@@ -67,7 +72,7 @@ public class NetAudioFragment extends BaseFragment {
 
                 CacheUtils.putString(mContext, Constants.NET_AUDIO_URL, result);
                 LogUtil.e("onSuccess==" + result);
-//                processData(result);
+                processData(result);
             }
 
             @Override
@@ -87,6 +92,36 @@ public class NetAudioFragment extends BaseFragment {
         });
     }
 
+    private void processData(String result) {
+
+
+        datas = parsedJson(result);
+        LogUtil.e(datas.get(0).getText() + "-----------");
+//        if(datas != null && datas.size() >0){
+//            //有视频
+//            tvNomedia.setVisibility(View.GONE);
+//            //设置适配器
+//            myAdapter = new NetAudioFragmentAdapter(mContext,datas);
+//            listview.setAdapter(myAdapter);
+//        }else{
+//            //没有视频
+//            tvNomedia.setVisibility(View.VISIBLE);
+//        }
+//
+//        progressbar.setVisibility(View.GONE);
+
+    }
+
+    /**
+     * 使用Gson解析json数据
+     *
+     * @param json
+     * @return
+     */
+    private List<NetAudioBean.ListBean> parsedJson(String json) {
+        NetAudioBean netAudioBean = new Gson().fromJson(json, NetAudioBean.class);
+        return netAudioBean.getList();
+    }
 
     @Override
     public void onDestroyView() {
