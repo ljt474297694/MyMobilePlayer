@@ -76,6 +76,7 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return initViewHolder(viewType);
     }
+
     private RecyclerView.ViewHolder initViewHolder(int itemViewType) {
         RecyclerView.ViewHolder viewHolder = null;
         View convertView = null;
@@ -126,6 +127,7 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
             adHolder.setData(datas.get(position));
         }
     }
+
     @Override
     public int getItemViewType(int position) {
         int itemViewType = -1;
@@ -146,9 +148,10 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
         }
         return itemViewType;
     }
+
     @Override
     public int getItemCount() {
-        return datas.size();
+        return datas.size() ;
     }
 
     class BaseRecyclerViewHolder extends RecyclerView.ViewHolder {
@@ -177,6 +180,25 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
             tvShenheCaiNumber = (TextView) convertView.findViewById(R.id.tv_shenhe_cai_number);
             tvPostsNumber = (TextView) convertView.findViewById(R.id.tv_posts_number);
             llDownload = (LinearLayout) convertView.findViewById(R.id.ll_download);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NetAudioBean.ListBean listEntity = datas.get(getLayoutPosition());
+                    if (listEntity != null) {
+                        //3.传递视频列表
+                        Intent intent = new Intent(mContext, ShowImageAndGifActivity.class);
+                        if (listEntity.getType().equals("gif")) {
+                            String url = listEntity.getGif().getImages().get(0);
+                            intent.putExtra("url", url);
+                            mContext.startActivity(intent);
+                        } else if (listEntity.getType().equals("image")) {
+                            String url = listEntity.getImage().getBig().get(0);
+                            intent.putExtra("url", url);
+                            mContext.startActivity(intent);
+                        }
+                    }
+                }
+            });
         }
 
         /**
@@ -203,33 +225,15 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
                 }
                 tvVideoKindText.setText(buffer.toString());
             }
-
             //设置点赞，踩,转发
 
             tvShenheDingNumber.setText(mediaItem.getUp() + "");
             tvShenheCaiNumber.setText(mediaItem.getDown() + "");
             tvPostsNumber.setText(mediaItem.getForward() + "");
 //设置item的点击事件
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    NetAudioBean.ListBean listEntity = datas.get(getLayoutPosition());
-                    if (listEntity != null) {
-                        //3.传递视频列表
-                        Intent intent = new Intent(mContext, ShowImageAndGifActivity.class);
-                        if (listEntity.getType().equals("gif")) {
-                            String url = listEntity.getGif().getImages().get(0);
-                            intent.putExtra("url", url);
-                            mContext.startActivity(intent);
-                        } else if (listEntity.getType().equals("image")) {
-                            String url = listEntity.getImage().getBig().get(0);
-                            intent.putExtra("url", url);
-                            mContext.startActivity(intent);
-                        }
-                    }
-                }
-            });
+
         }
+
     }
 
     class ImageHolder extends BaseRecyclerViewHolder {
@@ -277,12 +281,15 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
             tvCommantContext = (TextView) convertView.findViewById(R.id.tv_commant_context);
             jcvVideoplayer = (JCVideoPlayerStandard) convertView.findViewById(R.id.jcv_videoplayer);
         }
+        @Override
         public void setData(NetAudioBean.ListBean mediaItem) {
             super.setData(mediaItem);
 
             //设置文本-所有的都有,只有广告没有哦
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
-
+            if(mediaItem.isTop_comments()) {
+                tvCommantContext.setText(mediaItem.getTop_comments().get(0).getContent());
+            }
             //视频特有的------------------------
             //第一个参数是视频播放地址，第二个参数是显示封面的地址，第三参数是标题
             boolean setUp = jcvVideoplayer.setUp(

@@ -223,7 +223,12 @@ public class NetAudioBean {
         public List<TopCommentsBean> getTop_comments() {
             return top_comments;
         }
-
+        public boolean isTop_comments(){
+            if(getTop_comments()!=null&&getTop_comments().size()>0) {
+                return true;
+            }
+            return false;
+        }
         public void setTop_comments(List<TopCommentsBean> top_comments) {
             this.top_comments = top_comments;
         }

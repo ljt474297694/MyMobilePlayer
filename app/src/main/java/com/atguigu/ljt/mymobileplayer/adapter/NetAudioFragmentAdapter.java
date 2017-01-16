@@ -245,7 +245,9 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
         }
         public void setData(NetAudioBean.ListBean mediaItem) {
             super.setData(mediaItem);
-
+            if(mediaItem.isTop_comments()) {
+                tvCommantContext.setText(mediaItem.getTop_comments().get(0).getContent());
+            }
             //设置文本-所有的都有,只有广告没有哦
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
 
