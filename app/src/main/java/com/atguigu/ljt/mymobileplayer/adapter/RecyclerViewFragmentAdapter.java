@@ -1,17 +1,20 @@
 package com.atguigu.ljt.mymobileplayer.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atguigu.ljt.mymobileplayer.R;
+import com.atguigu.ljt.mymobileplayer.activity.ShowImageAndGifActivity;
 import com.atguigu.ljt.mymobileplayer.bean.NetAudioBean;
 import com.atguigu.ljt.mymobileplayer.util.Utils;
-import com.atguigu.ljt.mymobileplayer.viewholder.BaseViewHolder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -24,20 +27,15 @@ import java.util.List;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 
+
 /**
  * Created by 李金桐 on 2017/1/16.
  * QQ: 474297694
- * 功能: NetAudioFragment item 配适器
+ * 功能: RecyclerView的配适器
  */
 
-public class NetAudioFragmentAdapter extends BaseAdapter {
-    private final Context mContext;
-    private final List<NetAudioBean.ListBean> datas;
 
-    public NetAudioFragmentAdapter(Context mContext, List<NetAudioBean.ListBean> datas) {
-        this.mContext = mContext;
-        this.datas = datas;
-    }
+public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter {
 
     /**
      * 视频
@@ -66,34 +64,75 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
     private static final int TYPE_AD = 4;
 
 
-    /**
-     * 返回总数量
-     * @return
-     */
-    @Override
-    public int getCount() {
-        return datas.size();
+    private final Context mContext;
+    private final List<NetAudioBean.ListBean> datas;
+
+    public RecyclerViewFragmentAdapter(Context mContext, List<NetAudioBean.ListBean> datas) {
+        this.mContext = mContext;
+        this.datas = datas;
     }
 
-    //返回总类型数据
     @Override
-    public int getViewTypeCount() {
-        return 5;
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return initViewHolder(viewType);
+    }
+    private RecyclerView.ViewHolder initViewHolder(int itemViewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        View convertView = null;
+        switch (itemViewType) {
+            case TYPE_VIDEO://视频
+                convertView = View.inflate(mContext, R.layout.all_video_item, null);
+                viewHolder = new VideoHolder(convertView);
+
+                break;
+            case TYPE_IMAGE://图片
+                convertView = View.inflate(mContext, R.layout.all_image_item, null);
+                viewHolder = new ImageHolder(convertView);
+                break;
+            case TYPE_TEXT://文字
+                convertView = View.inflate(mContext, R.layout.all_text_item, null);
+                viewHolder = new TextHolder(convertView);
+                break;
+            case TYPE_GIF://gif
+                convertView = View.inflate(mContext, R.layout.all_gif_item, null);
+                viewHolder = new GifHolder(convertView);
+
+                break;
+            case TYPE_AD://软件广告
+                convertView = View.inflate(mContext, R.layout.all_ad_item, null);
+                viewHolder = new ADHolder(convertView);
+                break;
+        }
+        return viewHolder;
     }
 
-    /**
-     * 当前item是什么类型
-     *
-     * @param position
-     * @return
-     */
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        if (getItemViewType(position) == TYPE_VIDEO) {
+            VideoHolder videoHoder = (VideoHolder) holder;
+            videoHoder.setData(datas.get(position));
+        } else if (getItemViewType(position) == TYPE_IMAGE) {
+            ImageHolder imageHolder = (ImageHolder) holder;
+            imageHolder.setData(datas.get(position));
+        } else if (getItemViewType(position) == TYPE_TEXT) {
+            TextHolder textHolder = (TextHolder) holder;
+            textHolder.setData(datas.get(position));
+        } else if (getItemViewType(position) == TYPE_GIF) {
+            GifHolder gifHolder = (GifHolder) holder;
+            gifHolder.setData(datas.get(position));
+        } else {
+            ADHolder adHolder = (ADHolder) holder;
+            adHolder.setData(datas.get(position));
+        }
+    }
     @Override
     public int getItemViewType(int position) {
         int itemViewType = -1;
         //根据位置，从列表中得到一个数据对象
         NetAudioBean.ListBean listBean = datas.get(position);
         String type = listBean.getType();//得到类型
-//        Log.e("TAG", "type===" + type);
+        Log.e("TAG", "type===" + type);
         if ("video".equals(type)) {
             itemViewType = TYPE_VIDEO;
         } else if ("image".equals(type)) {
@@ -107,99 +146,93 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
         }
         return itemViewType;
     }
-
-
-
     @Override
-    public Object getItem(int position) {
-        return null;
+    public int getItemCount() {
+        return datas.size();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
+    class BaseRecyclerViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivHeadpic;
+        TextView tvName;
+        TextView tvTimeRefresh;
+        ImageView ivRightMore;
+        ImageView ivVideoKind;
+        TextView tvVideoKindText;
+        TextView tvShenheDingNumber;
+        TextView tvShenheCaiNumber;
+        TextView tvPostsNumber;
+        LinearLayout llDownload;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = initView(convertView, getItemViewType(position), datas.get(position));
-        return convertView;
-    }
-    private View initView(View convertView, int itemViewType, NetAudioBean.ListBean mediaItem) {
-        switch (itemViewType) {
-            case TYPE_VIDEO://视频
-
-                VideoHolder videoHoder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.all_video_item, null);
-                    videoHoder = new VideoHolder(convertView);
-                    convertView.setTag(videoHoder);
-                } else {
-                    videoHoder = (VideoHolder) convertView.getTag();
-                }
-
-                //设置数据
-                videoHoder.setData(mediaItem);
-
-                break;
-            case TYPE_IMAGE://图片
-                ImageHolder imageHolder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.all_image_item, null);
-                    imageHolder = new ImageHolder(convertView);
-                    convertView.setTag(imageHolder);
-                } else {
-                    imageHolder = (ImageHolder) convertView.getTag();
-                }
-                //设置数据
-                imageHolder.setData(mediaItem);
-                break;
-            case TYPE_TEXT://文字
-
-                TextHolder textHolder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.all_text_item, null);
-                    textHolder = new TextHolder(convertView);
-
-                    convertView.setTag(textHolder);
-                } else {
-                    textHolder = (TextHolder) convertView.getTag();
-                }
-
-                textHolder.setData(mediaItem);
-
-                break;
-            case TYPE_GIF://gif
-
-                GifHolder gifHolder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.all_gif_item, null);
-                    gifHolder = new GifHolder(convertView);
-
-                    convertView.setTag(gifHolder);
-                } else {
-                    gifHolder = (GifHolder) convertView.getTag();
-                }
-
-                gifHolder.setData(mediaItem);
-
-                break;
-            case TYPE_AD://软件广告
-
-                ADHolder adHolder;
-                if (convertView == null) {
-                    convertView = View.inflate(mContext, R.layout.all_ad_item, null);
-                    adHolder = new ADHolder(convertView);
-                    convertView.setTag(adHolder);
-                } else {
-                    adHolder = (ADHolder) convertView.getTag();
-                }
-
-                break;
+        public BaseRecyclerViewHolder(View convertView) {
+            super(convertView);
+            //公共的
+            ivHeadpic = (ImageView) convertView.findViewById(R.id.iv_headpic);
+            tvName = (TextView) convertView.findViewById(R.id.tv_name);
+            tvTimeRefresh = (TextView) convertView.findViewById(R.id.tv_time_refresh);
+            ivRightMore = (ImageView) convertView.findViewById(R.id.iv_right_more);
+            //bottom
+            ivVideoKind = (ImageView) convertView.findViewById(R.id.iv_video_kind);
+            tvVideoKindText = (TextView) convertView.findViewById(R.id.tv_video_kind_text);
+            tvShenheDingNumber = (TextView) convertView.findViewById(R.id.tv_shenhe_ding_number);
+            tvShenheCaiNumber = (TextView) convertView.findViewById(R.id.tv_shenhe_cai_number);
+            tvPostsNumber = (TextView) convertView.findViewById(R.id.tv_posts_number);
+            llDownload = (LinearLayout) convertView.findViewById(R.id.ll_download);
         }
-        return convertView;
+
+        /**
+         * 设置公共的数据
+         *
+         * @param mediaItem
+         */
+        public void setData(NetAudioBean.ListBean mediaItem) {
+            if (mediaItem.getU() != null && mediaItem.getU().getHeader() != null && mediaItem.getU().getHeader().get(0) != null) {
+                x.image().bind(ivHeadpic, mediaItem.getU().getHeader().get(0));
+            }
+            if (mediaItem.getU() != null && mediaItem.getU().getName() != null) {
+                tvName.setText(mediaItem.getU().getName() + "");
+            }
+
+            tvTimeRefresh.setText(mediaItem.getPasstime());
+
+            //设置标签
+            List<NetAudioBean.ListBean.TagsBean> tagsEntities = mediaItem.getTags();
+            if (tagsEntities != null && tagsEntities.size() > 0) {
+                StringBuffer buffer = new StringBuffer();
+                for (int i = 0; i < tagsEntities.size(); i++) {
+                    buffer.append(tagsEntities.get(i).getName() + " ");
+                }
+                tvVideoKindText.setText(buffer.toString());
+            }
+
+            //设置点赞，踩,转发
+
+            tvShenheDingNumber.setText(mediaItem.getUp() + "");
+            tvShenheCaiNumber.setText(mediaItem.getDown() + "");
+            tvPostsNumber.setText(mediaItem.getForward() + "");
+//设置item的点击事件
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NetAudioBean.ListBean listEntity = datas.get(getLayoutPosition());
+                    if (listEntity != null) {
+                        //3.传递视频列表
+                        Intent intent = new Intent(mContext, ShowImageAndGifActivity.class);
+                        if (listEntity.getType().equals("gif")) {
+                            String url = listEntity.getGif().getImages().get(0);
+                            intent.putExtra("url", url);
+                            mContext.startActivity(intent);
+                        } else if (listEntity.getType().equals("image")) {
+                            String url = listEntity.getImage().getBig().get(0);
+                            intent.putExtra("url", url);
+                            mContext.startActivity(intent);
+                        }
+                    }
+                }
+            });
+        }
     }
-    class ImageHolder extends BaseViewHolder {
+
+    class ImageHolder extends BaseRecyclerViewHolder {
         TextView tvContext;
         ImageView ivImageIcon;
 
@@ -223,7 +256,8 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
             }
         }
     }
-    class VideoHolder extends BaseViewHolder {
+
+    class VideoHolder extends BaseRecyclerViewHolder {
         Utils utils;
         TextView tvContext;
         JCVideoPlayerStandard jcvVideoplayer;
@@ -265,7 +299,8 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         }
     }
-    class TextHolder extends BaseViewHolder {
+
+    class TextHolder extends BaseRecyclerViewHolder {
         TextView tvContext;
 
         TextHolder(View convertView) {
@@ -282,7 +317,8 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
         }
     }
-    class GifHolder extends BaseViewHolder {
+
+    class GifHolder extends BaseRecyclerViewHolder {
         TextView tvContext;
         ImageView ivImageGif;
         private ImageOptions imageOptions;
@@ -319,12 +355,14 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         }
     }
-    class ADHolder {
+
+    class ADHolder extends BaseRecyclerViewHolder {
         TextView tvContext;
         ImageView ivImageIcon;
         Button btnInstall;
 
         ADHolder(View convertView) {
+            super(convertView);
             //中间公共部分 -所有的都有
             tvContext = (TextView) convertView.findViewById(R.id.tv_context);
             btnInstall = (Button) convertView.findViewById(R.id.btn_install);

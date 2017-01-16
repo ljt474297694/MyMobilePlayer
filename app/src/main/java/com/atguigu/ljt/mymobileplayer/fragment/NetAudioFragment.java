@@ -63,7 +63,7 @@ public class NetAudioFragment extends BaseFragment {
         setListener();
         String saveJson = CacheUtils.getString(mContext, Constants.NET_AUDIO_URL);
         if (!TextUtils.isEmpty(saveJson)) {
-//            processData(saveJson);
+            processData(saveJson);
         }
 
         getDataFromNet();
@@ -160,4 +160,5 @@ public class NetAudioFragment extends BaseFragment {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
 }
