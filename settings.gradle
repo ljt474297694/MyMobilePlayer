@@ -1,1 +1,1 @@
-include ':app', ':xutils', ':PhotoView_library'
+include ':app', ':xutils', ':PhotoView_library', ':MaterialRefreshLayout-library'
