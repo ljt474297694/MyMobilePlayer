@@ -1,11 +1,24 @@
 package com.atguigu.ljt.mymobileplayer.fragment;
 
-import android.graphics.Color;
-import android.view.Gravity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.atguigu.ljt.mymobileplayer.R;
 import com.atguigu.ljt.mymobileplayer.base.BaseFragment;
+import com.atguigu.ljt.mymobileplayer.util.CacheUtils;
+import com.atguigu.ljt.mymobileplayer.util.Constants;
+
+import org.xutils.common.Callback;
+import org.xutils.common.util.LogUtil;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 
 /**
@@ -16,24 +29,68 @@ import com.atguigu.ljt.mymobileplayer.base.BaseFragment;
 
 public class NetAudioFragment extends BaseFragment {
 
-    private TextView textView;
+    private static final String TAG = NetAudioFragment.class.getSimpleName();
+    @Bind(R.id.listview)
+    ListView listview;
+    @Bind(R.id.progressbar)
+    ProgressBar progressbar;
+    @Bind(R.id.tv_nomedia)
+    TextView tvNomedia;
 
     @Override
     public View initView() {
-        textView = new TextView(mContext);
-        textView.setTextColor(Color.BLUE);
-        textView.setTextSize(20);
-        textView.setGravity(Gravity.CENTER);
-        return textView;
+        Log.e(TAG, "网络音频UI被初始化了");
+        View view = View.inflate(mContext, R.layout.fragment_net_audio, null);
+        ButterKnife.bind(this, view);
+
+        return view;
     }
 
     @Override
     protected void initData() {
         super.initData();
-        textView.setText("网络音频");
+        Log.e("TAG", "网络视频数据初始化了...");
 
+        String saveJson = CacheUtils.getString(mContext, Constants.NET_AUDIO_URL);
+        if (!TextUtils.isEmpty(saveJson)) {
+//            processData(saveJson);
+        }
+
+        getDataFromNet();
     }
-    protected void onRequesData(){
-        textView.setText("网络音频刷新");
-    };
+
+    private void getDataFromNet() {
+        RequestParams reques = new RequestParams(Constants.NET_AUDIO_URL);
+        x.http().get(reques, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+
+                CacheUtils.putString(mContext, Constants.NET_AUDIO_URL, result);
+                LogUtil.e("onSuccess==" + result);
+//                processData(result);
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                LogUtil.e("onError==" + ex.getMessage());
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                LogUtil.e("onCancelled==" + cex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                LogUtil.e("onFinished==");
+            }
+        });
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }
