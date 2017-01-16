@@ -1,13 +1,16 @@
 package com.atguigu.ljt.mymobileplayer.fragment;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atguigu.ljt.mymobileplayer.R;
+import com.atguigu.ljt.mymobileplayer.activity.ShowImageAndGifActivity;
 import com.atguigu.ljt.mymobileplayer.adapter.NetAudioFragmentAdapter;
 import com.atguigu.ljt.mymobileplayer.base.BaseFragment;
 import com.atguigu.ljt.mymobileplayer.bean.NetAudioBean;
@@ -57,13 +60,40 @@ public class NetAudioFragment extends BaseFragment {
     protected void initData() {
         super.initData();
         Log.e("TAG", "网络视频数据初始化了...");
-
+        setListener();
         String saveJson = CacheUtils.getString(mContext, Constants.NET_AUDIO_URL);
         if (!TextUtils.isEmpty(saveJson)) {
 //            processData(saveJson);
         }
 
         getDataFromNet();
+    }
+
+    private void setListener() {
+        //设置点击事件
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                NetAudioBean.ListBean listEntity = datas.get(position);
+                if(listEntity !=null ){
+                    //3.传递视频列表
+                    Intent intent = new Intent(mContext,ShowImageAndGifActivity.class);
+                    if(listEntity.getType().equals("gif")){
+                        String url = listEntity.getGif().getImages().get(0);
+                        intent.putExtra("url",url);
+                        mContext.startActivity(intent);
+                    }else if(listEntity.getType().equals("image")){
+                        String url = listEntity.getImage().getBig().get(0);
+                        intent.putExtra("url",url);
+                        mContext.startActivity(intent);
+                    }
+                }
+
+
+            }
+        });
     }
 
     private void getDataFromNet() {
